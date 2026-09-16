@@ -1,18 +1,11 @@
 from pathlib import Path
 
-import numpy as np
 import matplotlib.pyplot as plt
 
-from reaction_diffusion import (
-    AxisymmetricGrid,
-    FieldSpec,
-    build_axisymmetric_laplacian,
-    picard_iterate,
-    plot_convergence,
-)
+from reaction_diffusion import plot_convergence, solve_axisymmetric_reaction_diffusion
 
 
-def reaction(fields):
+def saturating_uptake_reaction(fields):
     """
     Generic saturating (Michaelis-Menten-style) coupling between two fields:
     consumption of `u` produces `v` at the same local rate.
@@ -28,32 +21,15 @@ def reaction(fields):
 
 
 def main() -> None:
-    grid = AxisymmetricGrid(nr=60, nz=60)
-    operator = build_axisymmetric_laplacian(grid)
-
-    boundary = np.zeros(grid.shape, dtype=bool)
-    boundary[-1, :] = True  # r = 1
-    boundary[:, 0] = True  # z = 0
-    boundary[:, -1] = True  # z = 1
-    boundary = boundary.reshape(-1)
-
-    ones = np.ones(grid.size)
-    specs = {
-        "u": FieldSpec(
-            diffusivity=1.0,
-            dirichlet_mask=boundary,
-            dirichlet_values=1.0 * ones,
-            initial=0.5 * ones,
-        ),
-        "v": FieldSpec(
-            diffusivity=0.5,
-            dirichlet_mask=boundary,
-            dirichlet_values=0.0 * ones,
-            initial=0.0 * ones,
-        ),
-    }
-
-    result = picard_iterate(operator, specs, reaction, omega=0.5, tol=1e-8, max_iter=200)
+    grid, result = solve_axisymmetric_reaction_diffusion(
+        saturating_uptake_reaction,
+        field_names=("u", "v"),
+        nr=60,
+        nz=60,
+        diffusivities={"u": 1.0, "v": 0.5},
+        boundary_values={"u": 1.0, "v": 0.0},
+        initial_values={"u": 0.5, "v": 0.0},
+    )
     print(f"Converged: {result.converged} after {result.iterations} iterations")
 
     u = result.fields["u"].reshape(grid.shape)

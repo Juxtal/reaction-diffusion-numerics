@@ -9,19 +9,29 @@ This is a generic numerics library. It ships with synthetic demonstration
 reactions only — no project-specific kinetics, fitted parameters, or
 experimental data.
 
+## Background
+
+This library started as a refactor of internship code: pulling ad-hoc,
+one-off reaction-diffusion solving scripts apart into a small, reusable,
+tested toolkit. It's a simplified, standalone version — generalized to
+synthetic demo reactions, with no internship-specific kinetics, parameters,
+or data.
+
 ## Structure
 
 ```
 examples/
-  bvp_1d.py            1-D shooting-method demo
-  axisymmetric_2d.py   2-D coupled Picard-iteration demo
-figures/                output figures from the examples
+  bvp_1d.py                     1-D shooting-method demo
+  axisymmetric_2d.py            2-D coupled Picard-iteration demo
+  custom_reaction_and_shape.py  same solver, custom reaction + domain shape
+figures/                        output figures from the examples
 src/reaction_diffusion/
-  grid.py               uniform axisymmetric (r, z) grid
-  operators.py          sparse axisymmetric Laplacian + Dirichlet BC helper
-  picard.py             coupled Picard fixed-point iteration
-  shooting.py           1-D second-order BVP solver (shooting method)
-  diagnostics.py        residual checks and convergence plots
+  grid.py                       uniform axisymmetric (r, z) grid
+  operators.py                  sparse axisymmetric Laplacian + Dirichlet BC helper
+  picard.py                     coupled Picard fixed-point iteration
+  axisymmetric.py               solve_axisymmetric_reaction_diffusion convenience wrapper
+  shooting.py                   1-D second-order BVP solver (shooting method)
+  diagnostics.py                residual checks and convergence plots
 tests/
 ```
 
@@ -36,9 +46,10 @@ pip install -e ".[dev]"
 ```bash
 python examples/bvp_1d.py
 python examples/axisymmetric_2d.py
+python examples/custom_reaction_and_shape.py
 ```
 
-Both scripts print convergence information and save a figure under
+All three scripts print convergence information and save a figure under
 `figures/`.
 
 ## Running tests
@@ -59,6 +70,13 @@ pytest
 - `FieldSpec` / `picard_iterate(operator, specs, reaction, ...)` — solves a
   coupled steady reaction-diffusion system `D_k * (L @ f_k) = reaction(f)[k]`
   by under-relaxed fixed-point iteration.
+- `solve_axisymmetric_reaction_diffusion(reaction, field_names, *, nr=60,
+  nz=60, boundary_mask=None, diffusivities=None, boundary_values=None,
+  initial_values=None, ...)` — convenience wrapper that assembles the grid,
+  operator, and `FieldSpec`s and runs `picard_iterate` in one call. The
+  reaction and the domain shape (grid resolution and Dirichlet boundary
+  region) are the pluggable parts; everything else falls back to a uniform
+  default per field. Returns `(grid, result)`.
 - `solve_second_order_bvp(rhs, x_span, y_left, y_right, slope_bracket, ...)`
   — solves `y'' = rhs(x, y, y')` with Dirichlet boundary conditions via the
   shooting method.
