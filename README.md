@@ -1,14 +1,29 @@
 # reaction-diffusion-numerics
 
-Small, self-contained numerical toolkit for steady nonlinear reaction-diffusion
-problems: a 1-D boundary-value solver based on the shooting method, and a
-coupled 2-D axisymmetric solver based on Picard (fixed-point) iteration over a
-sparse finite-difference Laplacian.
+# reaction-diffusion-numerics
+
+Small, self-contained numerical toolkit for **steady nonlinear reaction–diffusion
+problems** — the classic "what does the concentration profile look like inside a
+body where species diffuse in and react at the same time" question.
+
+The 2-D solver is **axisymmetric**, i.e. it works on cylinder-like domains
+(a catalyst pellet, an immobilised-enzyme bead, a packed cylinder, a tissue
+scaffold) where the fields depend on radius `r` and height `z` but not on the
+angle. It solves the coupled steady system
+
+    D_k ∇²f_k = R_k(f)        for each species k
+
+with Dirichlet boundary data, by Picard (fixed-point) iteration over a sparse
+finite-difference Laplacian. The reaction term `R_k` and the boundary region are
+the pluggable parts, so masking off part of the boundary also lets you treat
+shapes other than a full cylinder (discs, annuli, partially sealed surfaces).
+
+The 1-D solver is geometry-independent: a shooting-method solver for general
+second-order two-point boundary-value problems `y'' = rhs(x, y, y')`.
 
 This is a generic numerics library. It ships with synthetic demonstration
 reactions only — no project-specific kinetics, fitted parameters, or
 experimental data.
-
 ## Background
 
 This library started as a refactor of internship code: pulling ad-hoc,
