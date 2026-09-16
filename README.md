@@ -52,6 +52,12 @@ python examples/custom_reaction_and_shape.py
 All three scripts print convergence information and save a figure under
 `figures/`.
 
+## Example output
+
+| `bvp_1d.py` | `axisymmetric_2d.py` |
+| --- | --- |
+| ![1-D BVP result](figures/bvp_1d.png) | ![2-D axisymmetric result](figures/axisymmetric_2d.png) |
+
 ## Running tests
 
 ```bash
