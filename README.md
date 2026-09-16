@@ -1,5 +1,4 @@
-This package generalizes the algorithm from M. T. Tillmann, M. Ibañez, K. Dittmer, J. Lu, et al. “Modeling and Optimising Complex Enzymatic Reaction
-Processes: A Practical Guide for Biotechnologists and Bioprocess Engineers.” . On top of the original method, it adds ILR to solve the allocation problem.
+
 
 # reaction-diffusion-numerics
 
